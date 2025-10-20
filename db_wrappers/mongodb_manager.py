@@ -26,9 +26,16 @@ class MongoDBManager:
         # Store these as instance variables: self.client, self.db, self.conversations
         # Hint: self.client[database_name] gets a database
         # Hint: db[collection_name] gets a collection - use "conversations" as the collection_name
-        self.client = MongoClient(connection_string)
-        self.db = None #fixme!
-        self.conversations = None #fixme!
+        try:
+            self.client = MongoClient(connection_string)
+            self.db = self.client[database_name]
+            self.conversations: Collection = self.db["conversations"]
+            
+            self.client.server_info()
+            print("Successfully connected to MongoDB!")
+        except Exception as e:
+            print(f"Failed to connect to MongoDB: {e}")
+            raise e
 
         self._ensure_indexes()
 
