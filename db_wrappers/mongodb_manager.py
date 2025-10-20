@@ -68,7 +68,7 @@ class MongoDBManager:
 
         Hint: find_one({"user_id": user_id, "thread_name": thread_name})
         """
-        # document = self.conversations. fixme!
+        document = self.conversations.find_one({"user_id": user_id, "thread_name": thread_name})
         if not document or "messages" not in document:
             return []
         return document["messages"]
@@ -99,11 +99,22 @@ class MongoDBManager:
 
         Hint: self.conversations.update_one({filter goes here}, {update goes here}, upsert=True)
         """
-        conversation_id = f"{}_{}" # fixme!
-        # fixme! add fields to document
+        conversation_id = f"{user_id}_{thread_name}"
+        now = datetime.now(UTC).isoformat()
         document = {
+            "_id": conversation_id,
+            "user_id": user_id,
+            "thread_name": thread_name,
+            "messages": messages,
+            "created_at": now,
+            "updated_at": now        
         }
-        # fixme! self.conversations.
+        
+        self.conversations.update_one(
+            {"_id": conversation_id},
+            {"$set": document},
+            upsert=True
+        )
 
     def append_message(self, user_id: str, thread_name: str, message: Dict) -> None:
         """
