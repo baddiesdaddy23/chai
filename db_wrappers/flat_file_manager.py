@@ -8,7 +8,6 @@ class FlatFileManager:
     """
     Manages storing and retrieving chat conversations in flat JSON files.
     """
-
     def __init__(self, storage_dir="data"):
         """
         Initializes the FlatFileManager for a specific user.
@@ -18,7 +17,7 @@ class FlatFileManager:
         """
         self.storage_dir = storage_dir
         self._ensure_storage_exists()
-        self.conversations_index = {}  # Key: conversation_id => Value: Filepath
+        self.conversations_index = {} # Key: conversation_id => Value: Filepath
         self._init_index()
 
     def _ensure_storage_exists(self) -> None:
@@ -29,6 +28,8 @@ class FlatFileManager:
         Hint: Use os.makedirs() and its `exist_ok` parameter.
         """
         os.makedirs(self.storage_dir, exist_ok=True)
+        pass # fixme!
+
 
     def _init_index(self) -> None:
         """
@@ -38,25 +39,25 @@ class FlatFileManager:
         3 - Load the contents of conversations.json into self.conversations_index dictionary
         """
         index_file = os.path.join(self.storage_dir, "conversations.json")
-
         if not os.path.exists(index_file):
-            self.conversations_index = {}
             self.save_index()
         else:
-            with open(index_file, 'r') as f:
+            with open(index_file, "r") as f:
                 self.conversations_index = json.load(f)
+        pass # fixme!
 
     def save_index(self) -> None:
         """
         --- TODO 3: Save the conversations index to disk ---
-        This method should save the current state of self.conversations_index
+        This method should save the current state of self.conversations_index 
         to the conversations.json file in the storage directory.
         Ensure the JSON is human-readable by using proper formatting.
         Hint: Use json.dump() with the 'indent' parameter for readable formatting.
         """
         index_file = os.path.join(self.storage_dir, "conversations.json")
-        with open(index_file, 'w') as f:
-            json.dump(self.conversations_index, f, indent=2)
+        with open(index_file, "w") as file:
+            json.dump(self.conversations_index, file, indent=4)
+        pass #fixme!
 
     def get_conversation(self, conversation_id: str) -> List[any]:
         """
@@ -68,17 +69,16 @@ class FlatFileManager:
             - If the file does not exist it should return an empty list `[]` without raising an error.
             Hint: Use a try-except block to handle error case.
         """
-        if conversation_id not in self.conversations_index:
+        filepath = self.conversations_index.get(conversation_id)
+        if not filepath:
             return []
-
-        filepath = os.path.join(self.storage_dir, self.conversations_index[conversation_id])
-
+        full_path = os.path.join(self.storage_dir, filepath)
         try:
-            with open(filepath, 'r') as f:
-                messages = json.load(f)
-            return messages
-        except FileNotFoundError:
-            return []
+            with open(full_path, "r") as f:
+                return json.load(f)
+        except (FileNotFoundError):
+            return[]
+        pass # fixme!
 
     def save_conversation(self, conversation_id: str, relative_filepath: str, messages: List[any]) -> None:
         """
@@ -91,16 +91,12 @@ class FlatFileManager:
             - Use JSON formatting to make the file human-readable (e.g., indentation).
             Hint: Use `json.dump()` with the `indent` parameter.
         """
-        # Add to index
         self.conversations_index[conversation_id] = relative_filepath
-
-        # Save index to disk
         self.save_index()
-
-        # Save conversation to disk
-        filepath = os.path.join(self.storage_dir, relative_filepath)
-        with open(filepath, 'w') as f:
-            json.dump(messages, f, indent=2)
+        full_path = os.path.join(self.storage_dir, relative_filepath)
+        with open(full_path, "w") as f:
+            json.dump(messages, f, indent=5)
+        pass # fixme!
 
     def run_tests(self):
         print("Testing FlatFileManager._ensure_storage_exists()")
@@ -135,7 +131,6 @@ class FlatFileManager:
             print(f"Failed to delete storage directory: {e}")
 
         print("All tests passed!")
-
 
 if __name__ == "__main__":
     print("Testing FlatFileManager")
