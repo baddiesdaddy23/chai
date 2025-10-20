@@ -32,7 +32,7 @@ class MongoDBManager:
             self.conversations: Collection = self.db["conversations"]
             
             self.client.server_info()
-            print("Successfully connected to MongoDB!")
+            print(f"Successfully connected to MongoDB!")
         except Exception as e:
             print(f"Failed to connect to MongoDB: {e}")
             raise e
@@ -138,7 +138,7 @@ class MongoDBManager:
         Hint: $push adds to an array, $setOnInsert sets values only on insert
         Hint: update_one(filter, {"$push": {...}, "$set": {...}, "$setOnInsert": {...}}, upsert=True)
         """
-        conversation_id = "{user_id}_{thread_name}"
+        conversation_id = f"{user_id}_{thread_name}"
         now = datetime.now(UTC).isoformat()
         
         update = {
