@@ -138,12 +138,17 @@ class MongoDBManager:
         Hint: $push adds to an array, $setOnInsert sets values only on insert
         Hint: update_one(filter, {"$push": {...}, "$set": {...}, "$setOnInsert": {...}}, upsert=True)
         """
-        conversation_id = "" #fixme!
-        # fixme! fill out update
+        conversation_id = "{user_id}_{thread_name}"
+        now = datetime.now(UTC).isoformat()
+        
         update = {
-            "$push": {},
-            "$set": {},
+            "$push": {"messages": message},
+            "$set": {"updated_at": now},
             "$setOnInsert": {
+                "_id": conversation_id,
+                "user_id": user_id,
+                "thread_name": thread_name,
+                "created_at": now
             }
         }
 
@@ -169,7 +174,10 @@ class MongoDBManager:
 
         Hint: list(self.conversations.find({"user_id": user_id}, {"thread_name": True, "_id": False}))
         """
-        matches = list(self.conversations.find({}, {})) # fixme!
+        matches = list(self.conversations.find(
+            {"user_id": user_id},
+            {"thread_name": True, "_id": False}
+        )) 
         thread_names = []
         for record in matches:
             thread_names.append(record["thread_name"])
